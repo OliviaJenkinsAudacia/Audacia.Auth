@@ -78,8 +78,8 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
         ViewDataDictionary viewDataDictionary,
         AuthenticateResult? result)
     {
-        if (openIddictRequest == null) throw new ArgumentNullException(nameof(openIddictRequest));
-        if (httpRequest == null) throw new ArgumentNullException(nameof(httpRequest));
+        ArgumentNullException.ThrowIfNull(openIddictRequest);
+        ArgumentNullException.ThrowIfNull(httpRequest);
 
         if (result?.Succeeded != true)
         {
@@ -88,7 +88,7 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
 
         // If prompt=login was specified by the client application,
         // immediately return the user agent to the login page.
-        if (openIddictRequest.HasPrompt(Prompts.Login))
+        if (openIddictRequest.HasPromptValue(PromptValues.Login))
         {
             return HandleLoginPrompt(openIddictRequest, httpRequest);
         }
@@ -147,13 +147,13 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
             // return an authorization response without displaying the consent form.
             case ConsentTypes.Implicit:
             case ConsentTypes.External when authorizations.Any():
-            case ConsentTypes.Explicit when authorizations.Any() && !openIddictRequest.HasPrompt(Prompts.Consent):
+            case ConsentTypes.Explicit when authorizations.Any() && !openIddictRequest.HasPromptValue(PromptValues.Consent):
                 return await HandleSuccessfulSignInAsync(openIddictRequest, user, applicationId, authorizations).ConfigureAwait(false);
 
             // At this point, no authorization was found in the database and an error must be returned
             // if the client application specified prompt=none in the authorization request.
-            case ConsentTypes.Explicit when openIddictRequest.HasPrompt(Prompts.None):
-            case ConsentTypes.Systematic when openIddictRequest.HasPrompt(Prompts.None):
+            case ConsentTypes.Explicit when openIddictRequest.HasPromptValue(PromptValues.None):
+            case ConsentTypes.Systematic when openIddictRequest.HasPromptValue(PromptValues.None):
                 return ConsentRequiredResult("Interactive user consent is required.");
 
             // In every other case, render the consent form.
@@ -186,15 +186,12 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
         // Automatically create a permanent authorization to avoid requiring explicit consent
         // for future authorization or token requests containing the same scopes.
         var authorization = authorizations.LastOrDefault();
-        if (authorization is null)
-        {
-            authorization = await _authorizationManager.CreateAsync(
+        authorization ??= await _authorizationManager.CreateAsync(
                 principal: principal,
                 subject: user.GetId()!.ToString()!,
                 client: applicationId,
                 type: AuthorizationTypes.Permanent,
                 scopes: principal.GetScopes()).ConfigureAwait(false);
-        }
 
         principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false));
         principal.SetDestinations();
@@ -220,7 +217,7 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
 
     private static IActionResult HandleCookieTooOld(OpenIddictRequest openIddictRequest, HttpRequest httpRequest)
     {
-        if (openIddictRequest.HasPrompt(Prompts.None))
+        if (openIddictRequest.HasPromptValue(PromptValues.None))
         {
             return new ForbidResult(
                 OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
@@ -241,8 +238,7 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
 
     private static bool CookieTooOld(OpenIddictRequest openIddictRequest, AuthenticateResult result)
     {
-        return 
-            openIddictRequest.MaxAge != null &&
+        return openIddictRequest.MaxAge != null &&
             result.Properties?.IssuedUtc != null &&
             DateTimeOffset.UtcNow - result.Properties.IssuedUtc > TimeSpan.FromSeconds(openIddictRequest.MaxAge.Value);
     }
@@ -251,7 +247,7 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
     {
         // To avoid endless login -> authorization redirects, the prompt=login flag
         // is removed from the authorization request payload before redirecting the user.
-        var prompt = string.Join(" ", openIddictRequest.GetPrompts().Remove(Prompts.Login));
+        var prompt = string.Join(" ", openIddictRequest.GetPromptValues().Remove(PromptValues.Login));
 
         var parameters = httpRequest.HasFormContentType ?
             httpRequest.Form.Where(parameter => parameter.Key != Parameters.Prompt).ToList() :
@@ -271,7 +267,7 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
     {
         // If the client application requested promptless authentication,
         // return an error indicating that the user is not logged in.
-        if (openIddictRequest.HasPrompt(Prompts.None))
+        if (openIddictRequest.HasPromptValue(PromptValues.None))
         {
             return new ForbidResult(
                 OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
