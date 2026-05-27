@@ -1,25 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
+		<Authors>Audacia</Authors>
+        <Version>4.1.1</Version>
+		<PackageIcon>package-icon.png</PackageIcon>
+		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>Library to seed OpenIddict applications and scopes in the database.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+	<ItemGroup>
+		<None Include="..\..\package-icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '10.0'))">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
+	<!-- Package Versions for .NET 6.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0'))">
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
 	</ItemGroup>
-	
+
+	<!-- Package Versions for .NET 8.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+	</ItemGroup>
+
 	<ItemGroup>
-		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.12.1">
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.11.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-
 	</ItemGroup>
 
 	<ItemGroup>

@@ -3,4 +3,6 @@
 namespace Audacia.Auth.OpenIddict.EntityFramework.IntKey;
 
 /// <inheritdoc />
-public class OpenIddictEntityFrameworkAuthorization : OpenIddictEntityFrameworkAuthorization<int, OpenIddictEntityFrameworkApplication, OpenIddictEntityFrameworkToken>;
+public class OpenIddictEntityFrameworkAuthorization : OpenIddictEntityFrameworkAuthorization<int, OpenIddictEntityFrameworkApplication, OpenIddictEntityFrameworkToken>
+{
+}

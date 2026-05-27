@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Audacia.Auth.OpenIddict.Common.Configuration;
-using Shouldly;
+using FluentAssertions;
 using Xunit;
 
 namespace Audacia.Auth.OpenIddict.Tests.Common.Configuration;
@@ -19,7 +23,7 @@ public class ConfigurableTimespanTests
 
         var lifetime = configurableTimespan.GetLifetime();
 
-        lifetime.TotalDays.ShouldBe(expectedDays);
+        lifetime.TotalDays.Should().Be(expectedDays);
     }
 
     [Fact]
@@ -34,7 +38,7 @@ public class ConfigurableTimespanTests
 
         var lifetime = configurableTimespan.GetLifetime();
 
-        lifetime.TotalHours.ShouldBe(expectedHours);
+        lifetime.TotalHours.Should().Be(expectedHours);
     }
 
     [Theory]
@@ -51,7 +55,7 @@ public class ConfigurableTimespanTests
 
         var lifetime = configurableTimespan.GetLifetime();
 
-        lifetime.TotalMinutes.ShouldBe(expectedMinutes);
+        lifetime.TotalMinutes.Should().Be(expectedMinutes);
     }
 
     [Theory]
@@ -68,7 +72,7 @@ public class ConfigurableTimespanTests
 
         var lifetime = configurableTimespan.GetLifetime();
 
-        lifetime.TotalSeconds.ShouldBe(expectedSeconds);
+        lifetime.TotalSeconds.Should().Be(expectedSeconds);
     }
 
     [Theory]
@@ -76,8 +80,6 @@ public class ConfigurableTimespanTests
     [InlineData(-1)]
     public void Exception_when_value_is_less_than_or_equal_to_zero(int value)
     {
-        const string expectedMessage = "The value cannot be less than or equal to zero.";
-
         var configurableTimespan = new ConfigurableTimespan
         {
             Type = ConfigurableTimespanType.Hours,
@@ -86,6 +88,6 @@ public class ConfigurableTimespanTests
 
         Action action = () => configurableTimespan.GetLifetime();
 
-        action.ShouldThrow<ArgumentException>(expectedMessage);
+        action.Should().Throw<ArgumentException>().WithMessage("The value cannot be less than or equal to zero.");
     }
 }

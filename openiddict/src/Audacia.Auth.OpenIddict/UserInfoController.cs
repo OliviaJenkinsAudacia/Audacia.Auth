@@ -36,7 +36,7 @@ public class UserInfoController<TUser, TId> : Controller
     [HttpPost("~/connect/userinfo")]
     [IgnoreAntiforgeryToken]
     [Produces("application/json")]
-    public Task<IActionResult> UserinfoAsync()
+    public Task<IActionResult> Userinfo()
     {
         return _userInfoHandler.HandleAsync(User);
     }

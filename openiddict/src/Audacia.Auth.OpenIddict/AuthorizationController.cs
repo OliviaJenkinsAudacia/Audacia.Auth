@@ -44,7 +44,7 @@ public class AuthorizationController<TUser, TId> : Controller
     [HttpPost("~/connect/authorize")]
     [AllowAnonymous]
     [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> AuthorizeAsync()
+    public async Task<IActionResult> Authorize()
     {
         var openIddictRequest = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
@@ -64,7 +64,7 @@ public class AuthorizationController<TUser, TId> : Controller
     [Produces("application/json")]
     [AllowAnonymous]
     [IgnoreAntiforgeryToken]
-    public Task<IActionResult> ExchangeAsync()
+    public Task<IActionResult> Exchange()
     {
         var openIddictRequest = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");

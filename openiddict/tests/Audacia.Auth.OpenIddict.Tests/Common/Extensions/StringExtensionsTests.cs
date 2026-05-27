@@ -2,7 +2,7 @@
 using System.Security.Cryptography.X509Certificates;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Audacia.Auth.OpenIddict.DependencyInjection;
-using Shouldly;
+using FluentAssertions;
 using Xunit;
 
 namespace Audacia.Auth.OpenIddict.Tests.Common.Extensions;
@@ -18,7 +18,7 @@ public class StringExtensionsTests
     {
         var actualResult = valuetoParse.ParseStoreLocation();
 
-        actualResult.ShouldBe(expectedResult);
+        actualResult.Should().Be(expectedResult);
     }
 
     [Fact]
@@ -26,6 +26,6 @@ public class StringExtensionsTests
     {
         Action action = () => "not valid".ParseStoreLocation();
 
-        action.ShouldThrow<OpenIddictConfigurationException>();
+        action.Should().ThrowExactly<OpenIddictConfigurationException>();
     }
 }
